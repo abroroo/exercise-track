@@ -100,16 +100,6 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
           } res.json(foundE);
         })
           
-  
-          
-        //  else {
-        //   exerciseTrackModel.findOne({_id: queryId}), (err, data) => {
-        //     if (err) console.error(err)
-        //     console.log("Showing data from exercise Track Model")
-        //     res.send({data})
-        //   }
-        // }
-       
       } else {
         res.json(`User with id: <${queryId}> doesn't exist!`)
       }
@@ -118,7 +108,11 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
 })
 
 
+app.get("/api/users", async (req, res) => {
+  let allUsers = await userNameModel.find({})
 
+  res.json(allUsers)
+})
 
 
 
