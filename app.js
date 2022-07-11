@@ -32,9 +32,9 @@ app.get('/', (req, res) => {
 
 const userSchema = mongoose.Schema({
     username: String,
-    description: String,
-    duration: Number,
     date: Date,
+    duration: Number,
+    description: String
 },{versionKey: false}) // not to create _v in monogoDB collection 
 
 
@@ -48,7 +48,7 @@ let inputUsername = req.body.username;
   
 
     responseUserObj.username = inputUsername;
-    
+
     responseUserObj.save((err, savedData) => {
       if (err) console.error(err)
       console.log("New username created");
@@ -64,7 +64,7 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     let queryId = req.body.id;
     let formDesc = req.body.description;
     let formDur = req.body.duration;
-    let formDate = req.body.date;
+    let formDate = req.body.date || new Date().toDateString()
    
 
     userNameModel.findOne({_id: queryId}, (err, data) => {
