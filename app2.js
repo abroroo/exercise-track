@@ -37,8 +37,16 @@ const userSchema = mongoose.Schema({
     date: Date,
 },{versionKey: false}) // not to create _v in monogoDB collection 
 
+const exerciseSchema = mongoose.Schema({
+    username: String,
+    description: String,
+    duration: Number,
+    date: Date,
+}, {versionKey: false})
 
 let userNameModel = mongoose.model('userNameModel', userSchema)
+let exerciseTrackModel = mongoose.model('exerciseTrackModel', exerciseSchema);
+
 
 let responseUserObj = new userNameModel();
 
@@ -46,18 +54,24 @@ app.post('/api/users', (req, res) => {
     
 let inputUsername = req.body.username;
   
-
+userNameModel.findOne({username: inputUsername}, (err, data) => {
+  if (err) console.log(err)
+  if (data) {
+    console.log("Data has already been submitted")
+    res.json(responseUserObj)
+  } else {
     responseUserObj.username = inputUsername;
-    
     responseUserObj.save((err, savedData) => {
       if (err) console.error(err)
       console.log("New username created");
       res.json(responseUserObj)
     })
-
+  }
+})
     
 })
 
+let responseExerciseObj = new exerciseTrackModel(); 
 
 app.post('/api/users/:_id/exercises', (req, res, next) => {
 
@@ -70,19 +84,26 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     userNameModel.findOne({_id: queryId}, (err, data) => {
       if (err) console.error(err)
       if (data) {
-        console.log(`username with this id: ${queryId}  exists`);
+        console.log(`username with this id: ${queryId}  exists`)
 
-          responseUserObj.username = data.username; 
-          responseUserObj.description = formDesc;
-          responseUserObj.duration = formDur;
-          responseUserObj.date = formDate;
+        exerciseTrackModel.findOne({_id: queryId}, (err, foundE) => {
+          if (err) console.error(err)
+          if (!foundE) {
+            responseExerciseObj._id = queryId
+          responseExerciseObj.username = data.username; 
+          responseExerciseObj.description = formDesc;
+          responseExerciseObj.duration = formDur;
+          responseExerciseObj.date = formDate;
 
-          responseUserObj.save().then((err, result) => {
+          responseExerciseObj.save().then((err, result) => {
             if (err) console.error(err)
-            console.log("new responseUserObj is created")
-            res.json(responseUserObj);
+            console.log("new responseExerciseObj is created")
+            res.json(responseExerciseObj);
           }) 
-        } else {
+          } res.json(foundE);
+        })
+          
+      } else {
         res.json(`User with id: <${queryId}> doesn't exist!`)
       }
     })
