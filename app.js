@@ -75,7 +75,7 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     let queryId = req.body.id;
     let formDesc = req.body.description;
     let formDur = req.body.duration;
-    let formDate = req.body.date 
+    let formDate = req.body.date || new Date().toDateString()
     // ? new Date(req.body.date).toDateString() : new Date().toDateString();
    
 
