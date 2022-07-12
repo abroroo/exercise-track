@@ -72,7 +72,7 @@ app.get("/api/users", async (req, res) => {
 
 app.post('/api/users/:_id/exercises', (req, res, next) => {
 
-    let queryId = req.body.id;
+    let formId = req.body.id;
     let formDesc = req.body.description;
     let formDur = req.body.duration;
     let formDate = req.body.date || new Date().toDateString()
@@ -85,11 +85,11 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     date: formDate
   }
 
-  userNameModel.findByIdAndUpdate(queryId, {$push:{log: logObj}}, {new: true}, (err, result) => {
+  userNameModel.findByIdAndUpdate(formId, {$push:{log: logObj}}, {new: true}, (err, result) => {
     if (err) console.error(err)
 
     let responseObj = {
-      "_id": queryId,
+      "_id": formId,
       "username": result.username,
       "date": logObj.date,
       "duration": parseInt(logObj.duration),
@@ -126,8 +126,12 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     // next()*/
 })
 
+
 app.get('/api/users/:_id/logs', (req, res) => {
   let queryId = req.params._id;
+  let from = req.query.from;
+  let to = req.query.to;
+  let limit = +req.query.limit;
 
   userNameModel.findById({_id: queryId}, (err, data) => {
     if (err) console.error(err)
@@ -140,6 +144,17 @@ app.get('/api/users/:_id/logs', (req, res) => {
 
     }})
 
+    if (from){
+      const fromDate = new Date(from)
+      log = log.filter(exe => new Date(exe.date)>= fromDate)
+    }
+    if (to){
+      const toDate = new Date(to)
+      log = log.filter(exe => new Date(exe.date)<= toDate)
+    }
+    if(limit){
+      log = log.slice(0,limit)
+    }
     console.log("This is log " + log)
 
     let count = log.length;
@@ -148,7 +163,7 @@ app.get('/api/users/:_id/logs', (req, res) => {
       "username": data.username,
       "count": count,
       "_id": queryId,
-      "log": data.log
+      "log": log
     })
   })
 })
