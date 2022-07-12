@@ -50,10 +50,10 @@ app.post('/api/users', (req, res) => {
     
 let inputUsername = req.body.username;
   
-let responseUser = new userNameModel({
-  username: `${inputUsername}`
+let User = new userNameModel({
+  username: inputUsername
 })
-    responseUser.save((err, savedData) => {
+    User.save((err, savedData) => {
       if (err) console.error(err)
       console.log("New username created");
       res.send({
@@ -92,7 +92,7 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
       "_id": queryId,
       "username": result.username,
       "date": logObj.date,
-      "duration": logObj.duration,
+      "duration": parseInt(logObj.duration),
       "description": logObj.description
     }
 
@@ -135,7 +135,7 @@ app.get('/api/users/:_id/logs', (req, res) => {
     let log = data.log.map((a) => {
       return {
         description: a.description,
-        duration: a.duration,
+        duration: parseInt(a.duration),
         date: a.date
 
     }})
