@@ -65,15 +65,13 @@ const userSchema = mongoose.Schema({
 
 let userNameModel = mongoose.model('userNameModel', userSchema)
 
-
+let User = new userNameModel()
 
 app.post('/api/users', (req, res) => {
 
   let inputUsername = req.body.username;
 
-  let User = new userNameModel({
-    username: `${inputUsername}`
-  })
+  User.username = inputUsername
 
   User.save((err, savedData) => {
     if (err) console.error(err)
@@ -114,10 +112,11 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     new: true
   }, (err, result) => {
     if (err) console.error(err)
-
+console.log(result)
+    
     let responseObj = {
       "_id": formId,
-      "username": result.username,
+      "username": User.username,
       "date": logObj.date,
       "duration": parseInt(logObj.duration),
       "description": logObj.description
@@ -146,7 +145,7 @@ app.get('/api/users/:_id/logs', (req, res) => {
       return {
         description: a.description,
         duration: parseInt(a.duration),
-        date: newDate(a.date).toDateString()
+        date: new Date(a.date).toDateString()
 
       }
     })
@@ -167,9 +166,9 @@ app.get('/api/users/:_id/logs', (req, res) => {
     let count = log.length;
 
     res.send({
+      "_id": queryId,
       "username": data.username,
       "count": count,
-      "_id": queryId,
       "log": log
     })
   })
