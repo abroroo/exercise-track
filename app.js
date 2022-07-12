@@ -31,31 +31,42 @@ app.get('/', (req, res) => {
 
 
 const userSchema = mongoose.Schema({
-    username: String,
-    date: Date,
-    duration: Number,
-    description: String
+  username: { type: String, required: true },
+    log: [{
+      _id: false,
+      date: Date,
+      duration: Number,
+      description: String
+    }],
+    
 },{versionKey: false}) // not to create _v in monogoDB collection 
 
 
 let userNameModel = mongoose.model('userNameModel', userSchema)
 
-let responseUserObj = new userNameModel();
+
 
 app.post('/api/users', (req, res) => {
     
 let inputUsername = req.body.username;
   
-
-    responseUserObj.username = inputUsername;
-
-    responseUserObj.save((err, savedData) => {
+let responseUser = new userNameModel({
+  username: `${inputUsername}`
+})
+    responseUser.save((err, savedData) => {
       if (err) console.error(err)
       console.log("New username created");
-      res.json(responseUserObj)
+      res.send({
+        "username" : inputUsername,
+        "_id": savedData._id
+      })
     })
+})
 
-    
+app.get("/api/users", async (req, res) => {
+  let allUsers = await userNameModel.find({})
+
+  res.json(allUsers)
 })
 
 
@@ -64,18 +75,43 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
     let queryId = req.body.id;
     let formDesc = req.body.description;
     let formDur = req.body.duration;
-    let formDate = req.body.date || new Date().toDateString()
+    let formDate = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString();
    
 
+  const logObj = {
+    description: formDesc,
+    duration: formDur,
+    date: formDate
+  }
+
+  userNameModel.findByIdAndUpdate(queryId, {$push:{log: logObj}}, {new: true}, (err, result) => {
+    if (err) console.error(err)
+
+    let responseObj = {
+      "_id": queryId,
+      "username": result.username,
+      "date": logObj.date,
+      "duration": logObj.duration,
+      "description": logObj.description
+    }
+
+    res.json(responseObj)
+
+  })
+
+  //res.json(`User with id: <${queryId}> doesn't exist!`)
+/*
     userNameModel.findOne({_id: queryId}, (err, data) => {
       if (err) console.error(err)
       if (data) {
         console.log(`username with this id: ${queryId}  exists`);
 
           responseUserObj.username = data.username; 
-          responseUserObj.description = formDesc;
-          responseUserObj.duration = formDur;
-          responseUserObj.date = formDate;
+          responseUserObj.log.push({
+            date: formDate,
+            duration: formDur,
+            description: formDesc
+          });
 
           responseUserObj.save().then((err, result) => {
             if (err) console.error(err)
@@ -86,15 +122,36 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
         res.json(`User with id: <${queryId}> doesn't exist!`)
       }
     })
-    // next()
+    // next()*/
 })
 
+app.get('/api/users/:_id/logs', (req, res) => {
+  let queryId = req.params._id;
 
-app.get("/api/users", async (req, res) => {
-  let allUsers = await userNameModel.find({})
+  userNameModel.findById({_id: queryId}, (err, data) => {
+    if (err) console.error(err)
 
-  res.json(allUsers)
+    let log = data.log.map((a) => {
+      return {
+        description: a.description,
+        duration: a.duration,
+        date: a.date
+
+    }})
+
+    console.log("This is log " + log)
+
+    let count = log.length;
+
+    res.send({
+      "username": data.username,
+      "count": count,
+      "_id": queryId,
+      "log": data.log
+    })
+  })
 })
+
 
 
 
