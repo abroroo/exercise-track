@@ -1,0 +1,64 @@
+head
+  title Express
+  // CSS only
+  link(href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor' crossorigin='anonymous')
+  link(rel='stylesheet' href='/stylesheets/style.css')
+.container
+  h1 Exercise Tracker
+  .row
+    .card.col-4.p-3
+      h3 Create a New User
+      p
+        code POST /api/users
+      form.form-floating.mb-3(action='/api/users' method='post')
+        input.form-control(type='text' id='floatingInput uname' name='username' placeholder='Username')
+        label(for='floatingInput') @
+        input.btn.btn-success.mt-3(type='submit' value='Submit')
+    .card.col-8.p-3
+      h3 Add exercises
+      p
+        code POST /api/users/:_id/exercises
+      form#exercise-form(action='' method='post')
+        .form-floating.mb-3
+          input#uid.form-control(type='' name='id' placeholder='id' required='')
+          label(for='floatingInput') id
+        .form-floating.mb-3
+          input#desc.form-control(type='' name='description' placeholder='description' required='')
+          label(for='floatingInput') description
+        .form-floating.mb-3
+          input#dur.form-control(type='number' name='duration' placeholder='duration' required='')
+          label(for='floatingInput') duration
+        .form-floating.mb-3
+          input#date.form-control(type='date' name='date' placeholder='date')
+          label(for='floatingInput') date
+        input.btn.btn-success(type='submit' value='Submit')
+  p.mt-5
+    strong GET user&apos;s exercise log: 
+    code GET /api/users/:_id/logs?[from][&amp;to][&amp;limit]
+  p
+    strong [ ]
+    |  = optional
+  p
+    strong from, to
+    |  = dates (yyyy-mm-dd); 
+    strong limit
+    |  = number
+footer.container
+  .row
+    .col
+      p
+        a(href='www.freecodecamp.com') freeCodeCamp
+        |  project by 
+        a(href='https://github.com/abroroo') abroro
+script.
+  const exerciseForm = document.getElementById("exercise-form");
+  exerciseForm.addEventListener("submit", (e) => {
+  // e.preventDefault();
+  const userId = document.getElementById("uid").value;
+  exerciseForm.action = `/api/users/${userId}/exercises`;
+  exerciseForm.submit();
+  //exerciseForm.createAttribute("action");
+  // exerciseForm.setAttribute('action', `/api/users/${userId}/exercises`);
+  });
+// JavaScript Bundle with Popper
+script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js' integrity='sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2' crossorigin='anonymous')

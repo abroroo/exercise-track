@@ -18,7 +18,8 @@ app.use(bodyParser.urlencoded({
   extended: false
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.set('view engine', 'pug');
+app.set('views','./views');
 
 app.use(({ method, url, query, params, body }, res, next) => {
   console.log('>>> ', method, url);
@@ -48,7 +49,8 @@ connection.once('open', () => {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + "/views/index.html")
+ // res.sendFile(__dirname + "/views/index.html")
+  res.render('index');
 })
 
 
@@ -95,17 +97,20 @@ app.post('/api/users', (req, res) => {
     if (err) console.error(err)
    
     console.log("New username created");
-    res.send({
+    res.render("user/postuser.pug", {
       "username": inputUsername,
       "_id": savedData._id
     })
+
   })
 })
 
 app.get("/api/users", async (req, res) => {
   let allUsers = await userNameModel.find({})
 
-  res.json(allUsers)
+  res.render("user/getuser.pug", {
+    allUsers
+  })
 })
 
 
@@ -139,7 +144,8 @@ app.post('/api/users/:_id/exercises', (req, res, next) => {
       "_id": formId  
     }
 
-    res.json(responseObj)
+    res.render("exercise/postexercise", {
+      responseObj})
 
   })
 
@@ -181,7 +187,7 @@ app.get('/api/users/:_id/logs', (req, res) => {
 
     let count = log.length;
 
-    res.send({
+    res.render("logs/getlogs",{
       "username": data.username,
       "count": count,
       "_id": queryId,
