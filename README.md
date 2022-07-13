@@ -3,7 +3,7 @@ Database: MongoDB
 
 Back End: NodeJS
 
-Front End: BootStrap, JS, CSS, HTML
+Front End: BootStrap, JS, CSS, PUG
 
 ## User Stories
 
