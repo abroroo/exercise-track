@@ -20,6 +20,21 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+app.use(({ method, url, query, params, body }, res, next) => {
+  console.log('>>> ', method, url);
+  console.log(' QUERY:', query);
+  console.log(' PRAMS:', params);
+  console.log('  BODY:', body);
+  const _json = res.json;
+  res.json = function (data) {
+    console.log(' RESLT:', JSON.stringify(data, null, 2));
+    return _json.call(this, data);
+  };
+  console.log(' ----------------------------');
+  next();
+});
+
+
 const uri = process.env.MONGO_URI
 const connection = mongoose.connection;
 
@@ -65,16 +80,20 @@ const userSchema = mongoose.Schema({
 
 let userNameModel = mongoose.model('userNameModel', userSchema)
 
-let User = new userNameModel()
+
 
 app.post('/api/users', (req, res) => {
-
+  
   let inputUsername = req.body.username;
 
-  User.username = inputUsername
+  let User = new userNameModel({
+    username: inputUsername
+  })
+   
 
   User.save((err, savedData) => {
     if (err) console.error(err)
+   
     console.log("New username created");
     res.send({
       "username": inputUsername,
@@ -91,35 +110,33 @@ app.get("/api/users", async (req, res) => {
 
 
 app.post('/api/users/:_id/exercises', (req, res, next) => {
-
-  let formId = req.body.id;
+ 
   let formDesc = req.body.description;
   let formDur = req.body.duration;
   let formDate = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString();
-
+  let formId = req.params._id;
 
   const logObj = {
     description: formDesc,
-    duration: formDur,
+    duration: parseInt(formDur),
     date: formDate
   }
 
-  userNameModel.findByIdAndUpdate(formId, {
+  userNameModel.findByIdAndUpdate({_id: formId}, {
     $push: {
       log: logObj
     }
   }, {
     new: true
-  }, (err, result) => {
+  }, (err, data) => {
     if (err) console.error(err)
-console.log(result)
     
     let responseObj = {
-      "_id": formId,
-      "username": User.username,
-      "date": logObj.date,
+      "username": data.username,
+      "description": logObj.description,
       "duration": parseInt(logObj.duration),
-      "description": logObj.description
+      "date": logObj.date,
+      "_id": formId  
     }
 
     res.json(responseObj)
@@ -152,23 +169,22 @@ app.get('/api/users/:_id/logs', (req, res) => {
 
     if (from) {
       const fromDate = new Date(from)
-      log = log.filter(exe => new Date(exe.date) >= fromDate)
+      log = log.filter(a => new Date(a.date) >= fromDate)
     }
     if (to) {
       const toDate = new Date(to)
-      log = log.filter(exe => new Date(exe.date) <= toDate)
+      log = log.filter(a => new Date(a.date) <= toDate)
     }
     if (limit) {
       log = log.slice(0, limit)
     }
-    console.log("This is log " + log)
 
     let count = log.length;
 
     res.send({
-      "_id": queryId,
       "username": data.username,
       "count": count,
+      "_id": queryId,
       "log": log
     })
   })
