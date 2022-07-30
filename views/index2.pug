@@ -7,9 +7,8 @@ head
 .container
   .d-flex.mt-5
     h1.me-auto Exercise Tracker
-    a.m-2.btn.btn-primary(type='button' href='/login') Sign In
-    p.mt-3 or   
-    a.m-2.btn.btn-success(type='button' href='/register') Sign Up
+    form(action='/logout' method='post')
+      button.m-2.btn.btn-primary(type='submit') Log Out
   .row
     .card.col-4.p-3
       h3 Create a New User

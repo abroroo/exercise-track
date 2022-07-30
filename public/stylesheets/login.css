@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost&family=Nanum+Gothic&family=Nanum+Myeongjo&family=Oranienbaum&family=Vidaloka&display=swap');
+
+body {
+  padding: 50px;
+  font-family: 'Jost', sans-serif;
+  text-align: center;
+  max-width: max-content;
+  margin: auto;
+  
+}
