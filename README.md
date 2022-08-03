@@ -1,4 +1,9 @@
 # Exercise-Tracker Rest API Microservice [Full-Stack] [Demo](https://exercise-trackerf.herokuapp.com/)
+
+See the branch 'with-oauth' build google authentication
+See the branch 'jwt-auth' build with passport jwt authentication
+
+
 Database: MongoDB
 
 Back End: NodeJS
