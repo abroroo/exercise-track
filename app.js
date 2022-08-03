@@ -42,7 +42,7 @@ app.use(session({
  
   saveUninitialized: true,
   resave: false,
-  secret: [keys.session.secretKey],
+  secret: [process.env.secretKey],
   maxAge: 60 * 60 * 1000
 }))
 
