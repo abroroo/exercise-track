@@ -2,6 +2,10 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
 const keys = require('./keys');
 const AuthUserModel = require('../db-models/authModel');
+const dotenv = require("dotenv");
+dotenv.config({
+    path: "../.env"
+})
 
 // store to the cookie
 passport.serializeUser((user, done) => {
@@ -23,8 +27,8 @@ passport.use(
     new GoogleStrategy ({
         //options
         callbackURL: '/auth/google/redirect',
-        clientID : keys.google.clientID,
-        clientSecret: keys.google.clientSecret
+        clientID : process.env.clientID,
+        clientSecret: process.env.clientSecret
 
     }, (accessToken, refreshToken, profile, done) => {
         // check if user already exists in db
